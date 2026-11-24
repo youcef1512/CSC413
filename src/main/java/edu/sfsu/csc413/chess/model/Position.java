@@ -3,6 +3,7 @@ package edu.sfsu.csc413.chess.model;
 /**
 // switching from (letter, num) to position ints.*/
 public record Position(int file, int rank) {
+    public static final int BOARD_SIZE = 8;
     public static Position parse(String notation) {
         char fileLetter = notation.charAt(0);
         char rankDigit = notation.charAt(1);
