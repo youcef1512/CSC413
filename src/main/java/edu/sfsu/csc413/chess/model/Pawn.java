@@ -23,16 +23,62 @@ public class Pawn extends Piece {
     /**
      * What a pawn may become on reaching the far rank.
      */
-    private static final PieceType[] PROMOTION_CHOICES = { PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT };
+    private static final PieceType[] PROMOTION_CHOICES = {
+            PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT};
 
     public Pawn(Color color) {
-        super(color, PieceType.PAWN);
-    }
+                super(color, PieceType.PAWN);
+            }
+
 
     @Override
     public List<Move> pseudoLegalMoves(Board board, Position from) {
-        throw new UnsupportedOperationException("M2: implement Pawn.pseudoLegalMoves");
+        List<Move> moves = new ArrayList<>();
+        Position oneStep = from.offsetOrNull(0, color().pawnDirection());
+        if (oneStep != null && board.pieceAt(oneStep) == null) {
+            if (oneStep.rank() == color().promotionRank()) {
+
+                for (PieceType choice : PROMOTION_CHOICES) {
+                    Move promo = Move.promotion(from, oneStep, this, null, choice);
+                    moves.add(promo);
+                }
+            } else {
+                Move move = Move.quiet(from, oneStep, this);
+                moves.add(move);
+            }
+
+            Position twoStep = from.offsetOrNull(0, 2 * color().pawnDirection());
+            if (twoStep != null && board.pieceAt(twoStep) == null) {
+                if (from.rank() == color().pawnStartRank()) {
+                    Move movetwo = Move.quiet(from, twoStep, this);
+                    moves.add(movetwo);
+                }
+
+
+            }
+        }
+        Position left= from.offsetOrNull(-1, color().pawnDirection());
+        if (left!=null&&board.pieceAt(left)!=null) {
+            Piece occupant = board.pieceAt(left);
+            if (occupant.color()!=this.color()){
+                Move move= Move.capture(from, left, this, occupant);
+                moves.add(move);
+            }
+            };
+
+        Position right= from.offsetOrNull(1, color().pawnDirection());
+
+        if (right!=null&&board.pieceAt(right)!=null){
+            Piece occupant = board.pieceAt(right);
+            if (occupant.color()!=this.color()){
+                Move move1=Move.capture(from,right,this,occupant);
+                moves.add(move1);
+            }
+        }
+
+        return moves;
     }
+
 
     /**
      * A pawn attacks the two squares diagonally ahead of it, whether or not
@@ -47,6 +93,16 @@ public class Pawn extends Piece {
      */
     @Override
     public boolean attacks(Board board, Position from, Position target) {
-        throw new UnsupportedOperationException("M2: implement Pawn.attacks");
+        Position left= from.offsetOrNull(-1, color().pawnDirection());
+        Position right= from.offsetOrNull(1, color().pawnDirection());
+        if (left!=null&&left.equals(target)) {
+            return true;
+        }
+        if (right!=null&&right.equals(target)){
+            return true;
+        }
+        return false;
+
     }
+
 }

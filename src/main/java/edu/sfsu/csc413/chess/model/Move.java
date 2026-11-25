@@ -1,5 +1,4 @@
 package edu.sfsu.csc413.chess.model;
-
 /**
  * A single move: which piece went where, and what happened as a result.
  *
@@ -26,29 +25,32 @@ public record Move(Position from, Position to, Piece moved, Piece captured, Piec
      * A move to an empty square.
      */
     public static Move quiet(Position from, Position to, Piece moved) {
-        throw new UnsupportedOperationException("M2: implement Move.quiet");
+        return new Move(from, to, moved, null, null);
     }
 
     /**
      * A move that removes an enemy piece from the destination square.
      */
     public static Move capture(Position from, Position to, Piece moved, Piece captured) {
-        throw new UnsupportedOperationException("M2: implement Move.capture");
+        return new Move(from, to, moved, captured,null);
+
     }
 
     /**
      * A pawn reaching the far rank and becoming {@code promotesTo}.
      */
     public static Move promotion(Position from, Position to, Piece moved, Piece captured, PieceType promotesTo) {
-        throw new UnsupportedOperationException("M2: implement Move.promotion");
+        return new Move(from, to, moved, captured, promotesTo);
     }
 
-    public boolean isCapture() {
-        throw new UnsupportedOperationException("M2: implement Move.isCapture");
+    public boolean isCapture()
+    {
+        return captured != null;
     }
+
 
     public boolean isPromotion() {
-        throw new UnsupportedOperationException("M2: implement Move.isPromotion");
+        return promotesTo!=null;
     }
 
     /**
@@ -57,6 +59,16 @@ public record Move(Position from, Position to, Piece moved, Piece captured, Piec
      */
     @Override
     public String toString() {
-        throw new UnsupportedOperationException("M2: implement Move.toString");
+        if(isPromotion()==false){
+            String stringmove= ""+ from+to;
+            return stringmove;
+        }
+        else {
+            String stringmove = "" + from + to + Character.toLowerCase(promotesTo.symbol());
+
+            return stringmove;
+
+        }
+
     }
 }
