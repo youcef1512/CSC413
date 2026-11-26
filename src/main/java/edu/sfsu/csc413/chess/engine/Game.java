@@ -1,12 +1,13 @@
 package edu.sfsu.csc413.chess.engine;
 
 import edu.sfsu.csc413.chess.factory.BoardFactory;
-import edu.sfsu.csc413.chess.model.Board;
-import edu.sfsu.csc413.chess.model.Color;
-import edu.sfsu.csc413.chess.model.Move;
+import edu.sfsu.csc413.chess.model.*;
 
+import javax.swing.*;
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -45,11 +46,12 @@ public class Game {
     }
 
     public Board board() {
-        throw new UnsupportedOperationException("M3: implement Game.board");
+        return board;
+
     }
 
     public Color sideToMove() {
-        throw new UnsupportedOperationException("M3: implement Game.sideToMove");
+        return sideToMove;
     }
 
     /**
@@ -59,7 +61,8 @@ public class Game {
      * out would let any caller rewrite the game's past.
      */
     public List<Move> history() {
-        throw new UnsupportedOperationException("M3: implement Game.history");
+        return List.copyOf(history);
+
     }
 
     /**
@@ -71,7 +74,12 @@ public class Game {
      * or its callers.
      */
     public List<Move> legalMoves() {
-        throw new UnsupportedOperationException("M3: implement Game.legalMoves");
+        List<Move> moves = new ArrayList<>();
+        for(Position from: board.positionsOf(sideToMove)){
+            Piece piece =board.pieceAt(from);
+            moves.addAll(piece.pseudoLegalMoves(board,from));
+        }
+        return moves;
     }
 
     /**
@@ -84,8 +92,19 @@ public class Game {
      * with that case.
      */
     public Optional<Move> findLegalMove(String notation) {
-        throw new UnsupportedOperationException("M3: implement Game.findLegalMove");
+        List<Move> moves = legalMoves();
+        for (int i = 0; i < moves.size(); i++) {
+            Move current = moves.get(i);
+            if (current.toString().equalsIgnoreCase(notation)) {
+                return Optional.of(current);
+            }
+
+        }
+        return Optional.empty();
+
+
     }
+
 
     /**
      * Plays a move and passes the turn.
@@ -95,7 +114,12 @@ public class Game {
      *         {@link #legalMoves()}
      */
     public void play(Move move) {
-        throw new UnsupportedOperationException("M3: implement Game.play");
+        if(!legalMoves().contains(move)){
+            throw new IllegalArgumentException("Illegal move"+move);
+        }
+        board.apply(move);
+        history.add(move);
+        sideToMove=sideToMove.opposite();
     }
 
     /**
@@ -105,6 +129,18 @@ public class Game {
      * was captured. In Week 10 this becomes the Command pattern proper.
      */
     public Optional<Move> undoLastMove() {
-        throw new UnsupportedOperationException("M3: implement Game.undoLastMove");
+
+        if (history.isEmpty()) {
+            return Optional.empty();
+        }
+        Move lastMove = history.get(history.size() - 1);
+        history.remove(lastMove);
+        board.undo(lastMove);
+        sideToMove=sideToMove.opposite();
+        return Optional.of(lastMove);
+
     }
+
 }
+
+

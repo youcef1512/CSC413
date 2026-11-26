@@ -1,6 +1,9 @@
 package edu.sfsu.csc413.chess.model;
+import edu.sfsu.csc413.chess.factory.PieceFactory;
+
 import java.util.List;
 import java.util.ArrayList;
+
 
 public class Board {
     private final Piece[][] squares;
@@ -23,8 +26,28 @@ public class Board {
 
     public void place(Position position, Piece piece) {
         squares[position.file()][position.rank()] = piece;
+    }
+    //M3 move:
+    public void apply(Move move){
+        place(move.from(),null);
+        if(move.isPromotion()) {
+    Piece promoted = PieceFactory.create(move.promotesTo(), move.moved().color());
+
+            place(move.to(), promoted);
+        }
+        else{
+            place(move.to(), move.moved());
+
+
+        }
 
     }
+    public void undo(Move move){
+        place(move.from(),move.moved());
+        place(move.to(),move.captured());
+    }
+
+
 
     public List<Position> positionsOf(Color color) {
         List<Position> positions = new ArrayList<>();
